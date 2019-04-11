@@ -2,6 +2,7 @@ from torch.utils.data import Dataset
 
 import numpy as np
 
+
 class OFDMSamplesDataset(Dataset):
     """
     Class which handle the data set of samples
@@ -12,45 +13,64 @@ class OFDMSamplesDataset(Dataset):
 
     """
 
-
-    def __init__(self, file_path=None):
+    def __init__(self, file_path):
         """
 
-        :param file_name:
+        :param file_name: A string, the file path of the data set that need to be loaded
         """
         # TODO  Make sure to handle the case where the file path doesn't exist.
-        if file_path is not None:
-            # Load the file
-            data_set = np.load(file_path)
-            self.samples = data_set(0)
-            self.targeted_samples = data_set(1)
-        else:
-            print("File path undifined")
+        assert (file_path is not None), "File path isn't defined"
 
-
+        # Load the file
+        data_set = np.load(file_path)
+        self.samples = data_set[0]
+        self.targeted_samples = data_set[1]
 
     def __len__(self):
         """
-
-        :return:
+        Return the length of the data set. In this case, it will be the number of OFDM symbols
+        :return: A positive integer, the number of OFDM symbols (number of rows of the data set)
         """
+        return self.samples.shape[0]
 
-
-    def __getitem__(self, item):
+    def __getitem__(self, index):
         """
-
-        :param item:
-        :return:
+        Return an OFDM symbol from the data set
+        :param index: A positive integer, index of the OFDM symbol in the data set
+        :return: A tuple of complex numpy.array
         """
+        return self.samples[index, :], self.targeted_samples[index, :]
 
-    def save(self, samples, targeted_samples, file_path):
+    def get_number_of_carriers(self):
+        """
+        Give the number of carriers of the data set.
+        :return: self.samples.shape[1]
+        """
+        return self.samples.shape[1]
+
+    def get_dimensions(self):
+        """
+        Give shape of the data set
+        :return: self.samples.shape
+        """
+        return self.samples.shape
+
+    @staticmethod
+    def save(samples, targeted_samples, file_path):
         """
         Save a data set with numpy in a tuple structure.
         :param file_path: A string, the filepath where the file will be located
         :param samples: A N,M-complex array containing the samples at the receiver
         :param targeted_samples: A N,M-complex array containing the targeted sample at the emiter.
         """
+        #  Verify that the size of both matrix are consistent
+        print("shape comparison samples and targets", samples.shape, targeted_samples.shape)
+        assert (samples.shape == targeted_samples.shape), "Samples and targeted samples hasn't got the same shape : "
+
         data_set = (samples, targeted_samples)
 
         with open(file_path, "wb") as handle:
             np.save(handle, data_set)
+
+        print("Data set created at " + file_path)
+

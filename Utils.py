@@ -45,7 +45,19 @@ def from_complex_to_real(symbols):
     :param symbols: A 1D-complex array, containing the value of symbols.
     """
     print("cat shape", np.concatenate((np.real(symbols), np.imag(symbols)), axis=1).shape)
-    print('separated vector', np.real(symbols).shape,   np.imag(symbols).shape)
+    print('separated vector', np.real(symbols).shape, np.imag(symbols).shape)
     x = np.ravel(np.concatenate((np.real(symbols), np.imag(symbols)), axis=1))
     print("x shape", x.shape)
     return x
+
+
+def reshape_1D_to_OFDM(cp_length, nb_carriers, frame):
+    """
+    Reshape the 1D array into a bloc of OFDM symbols
+    :param cp_length: A positive integer, the length of the cyclic prefix
+    :param nb_carriers:
+    :param frame:
+    :return:
+    """
+    nb_ofdm_group = len(frame) // (cp_length + nb_carriers)
+    return np.reshape(frame, (nb_ofdm_group, (cp_length + nb_carriers),), )

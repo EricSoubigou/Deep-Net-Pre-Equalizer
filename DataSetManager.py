@@ -6,9 +6,12 @@ from Receiver import *
 from Emiter import *
 from Channel import *
 
+from OFDMSamplesDataset import *
+
+
 def create_data_set(dataset_param_dict):
     """ To create a data set and save it.
-    ::
+    :param dataset_param_dict :
     """
     # Creation of the trellis
     trellis = Trellis(
@@ -58,31 +61,13 @@ def create_data_set(dataset_param_dict):
     mod_frame = emiter.modulate_frame(enc_frame)
     # Go through the channel
     channel_frame = channel.get_trough(mod_frame)
-    # Demodulation of the received frame
-    demod_frame = receiver.demodulate_frame(channel_frame, demod_type="hard")
 
-    # Since we get through the channel, we formate the data for a tensor
-    # We reshape the frame at the reception
-    nb_ofdm_group = len(mod_frame) // (
-            dataset_param_dict["modulation"]["cp_length"]
-            + dataset_param_dict["modulation"]["nb_carriers"]
-    )
-    target_samples = np.reshape(
-        mod_frame,
-        (
-            nb_ofdm_group,
-            (
-                    dataset_param_dict["modulation"]["cp_length"]
-                    + dataset_param_dict["modulation"]["nb_carriers"]
-            ),
-        ),
-    )
-
-
-
-    # Convert complex values into real and cast into a tensor
-    target_samples = torch.from_numpy(from_complex_to_real(target_samples))
-    samples = torch.from_numpy(from_complex_to_real(demod_frame))
+    samples = reshape_1D_to_OFDM(dataset_param_dict["modulation"]["cp_length"],
+                                 dataset_param_dict["modulation"]["nb_carriers"],
+                                 mod_frame)
+    targets = reshape_1D_to_OFDM(dataset_param_dict["modulation"]["cp_length"],
+                                 dataset_param_dict["modulation"]["nb_carriers"],
+                                 channel_frame)
 
     # Save results in file
     filename = "./data_set/OFDM_non_lin_coeff_{}_iq_im_{}_eb_n0_{}_proakis_C.pt".format(
@@ -91,9 +76,8 @@ def create_data_set(dataset_param_dict):
         str(dataset_param_dict["eb_n0_db"]),
     )
 
-    torch.save(target_samples, filename)
+    OFDMSamplesDataset.save(samples, targets, filename)
 
-    print("Data set created at " + filename)
 
 ###
 
@@ -121,3 +105,9 @@ data_set_generation_param_dict = {
 
 if __name__ == '__main__':
     create_data_set(data_set_generation_param_dict)
+
+    # Load the data set using the Dataset class
+    data_set = OFDMSamplesDataset("./data_set/OFDM_non_lin_coeff_0_iq_im_None_eb_n0_10_proakis_C.pt")
+
+    print(data_set.get_dimensions())
+
