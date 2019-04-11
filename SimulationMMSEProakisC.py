@@ -3,15 +3,15 @@ from MonteCarlo import *
 simulation_param_dict = {
     "m_c_parameters": {
         "min_error_frame": 100,
-        "targeted_fer": 1e-3,
+        "targeted_fer": 5e-3,
         "step_db": 2,
         "min_eb_n0": 0,
         "max_eb_n0": 40,
     },
     "channel_parameters": {
         "non_lin_coeff": 0,
-        "iq_imbalance": None,
-        "channel_taps": np.array([1, 2, 3, 2, 1]),
+        "iq_imbalance": 1/3,
+        "channel_taps": np.array([1]),
     },
     "frame_length": 256,
     "modulation": {
@@ -20,7 +20,7 @@ simulation_param_dict = {
         "cp_length": 8,
         "off_carrier": 0,
     },
-    "equalizer": "MMSE",
+    "equalizer": "ZF",
     "channel_coding": {
         "mem_size": np.array([2]),
         "g_matrix": np.array([[0o5, 0o7]]),

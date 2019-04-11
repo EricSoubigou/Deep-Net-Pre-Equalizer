@@ -3,10 +3,10 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-# numpy
-import numpy as np
+from torch import optim
 
 from Utils import *
+
 
 class PreEqualizer(nn.Module):
     """ Neural net of the pre-equlizer
@@ -37,7 +37,7 @@ class PreEqualizer(nn.Module):
         for i in range(len(symbols) / self.symb_nb):
             # Convert the complex array to a 2D real array
             formated_symb = from_complex_to_real(
-                symbols[i * self.symb_nb : (i + 1) * self.symb_nb]
+                symbols[i * self.symb_nb: (i + 1) * self.symb_nb]
             )
             # Then feed the neural network with the adapted symbol
             out_1 = F.relu(self.fc1(formated_symb))
@@ -45,9 +45,9 @@ class PreEqualizer(nn.Module):
             out_3 = F.linear(self.fc3(out_2))
             # Convert the output to a complex vector.
             pre_equ_symbols[
-                i * self.symb_nb : (i + 1) * self.symb_nb
+            i * self.symb_nb: (i + 1) * self.symb_nb
             ] = from_real_to_complex(out_3)
-        # Lastly we sum the complex input with the ponderated ouptut of the network
+        # Lastly we sum the complex input with the weighted output of the network
         return symbols + self.alpha * pre_equ_symbols
 
     def backpropagation(self, output_symb, targeted_symb):

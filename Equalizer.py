@@ -24,7 +24,7 @@ class Equalizer:
         return self._name
 
 
-class Zero_Forcing(Equalizer):
+class ZeroForcing(Equalizer):
     """ Zero Forcing equalizers class
     """
 
@@ -70,7 +70,10 @@ class MMSE(Equalizer):
         self._noise_var_est = noise_var_est
 
 
-class NN_Equalizer(Equalizer):
+class NnEqualizer(Equalizer):
+    """
+    TODO !!!!!
+    """
     def __init__(self, pilot_symbols):
         super().__init__(pilot_symbols)
         self._name = "Zero-Forcing"
@@ -82,7 +85,7 @@ def switch_init_equalizer(equalizer_name, pilot_symbols):
     """ Instantiate the wanted equalizer given the name of the equalizer
     """
     equalizers = {
-        "ZF": Zero_Forcing(pilot_symbols=pilot_symbols),
+        "ZF": ZeroForcing(pilot_symbols=pilot_symbols),
         "MMSE": MMSE(pilot_symbols=pilot_symbols),
     }
     return equalizers.get(equalizer_name, None)

@@ -1,4 +1,5 @@
 import pickle
+import matplotlib.pyplot as plt
 
 from commpy.channelcoding.convcode import Trellis
 
@@ -6,6 +7,7 @@ from Emiter import *
 from Receiver import *
 from Channel import *
 from PhyLayer import *
+
 
 def monte_carlo_simulation(sim_param_dict):
     """ Perform the global simulation having the dictionary of parameters.
@@ -154,7 +156,7 @@ def monte_carlo_simulation(sim_param_dict):
     # Display results figures
     plt.plot(eb_n0_db, ber, "b")
     plt.yscale("log")
-    plt.title("BER restults")
+    plt.title("BER results")
     plt.xlabel("Eb/N0 (dB)")
     plt.ylabel("BER")
     plt.grid(True)
@@ -162,7 +164,7 @@ def monte_carlo_simulation(sim_param_dict):
 
     plt.plot(snr_db, fer, "b")
     plt.yscale("log")
-    plt.title("FER restults")
+    plt.title("FER results")
     plt.xlabel("SNR (dB)")
     plt.ylabel("FER")
     plt.grid(True)

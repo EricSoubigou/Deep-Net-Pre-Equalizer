@@ -1,7 +1,6 @@
 import scipy as sp
 from scipy import fftpack
 
-import numpy as np
 import commpy as cp
 
 from Equalizer import switch_init_equalizer
@@ -10,6 +9,7 @@ from Utils import *
 """
     Receiver class
 """
+
 
 class Receiver:
     """ Class of the Receivers

@@ -3,12 +3,12 @@
 """
 
 import commpy as cp
-import scipy as sp
 import copy as cpy
 
 from scipy import fftpack
 
 from Utils import *
+
 
 class Emiter:
     """ Class of the emiter.

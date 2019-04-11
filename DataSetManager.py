@@ -78,11 +78,11 @@ def create_data_set(dataset_param_dict):
         ),
     )
 
+
+
     # Convert complex values into real and cast into a tensor
     target_samples = torch.from_numpy(from_complex_to_real(target_samples))
-    print(target_samples)
     samples = torch.from_numpy(from_complex_to_real(demod_frame))
-    print(samples)
 
     # Save results in file
     filename = "./data_set/OFDM_non_lin_coeff_{}_iq_im_{}_eb_n0_{}_proakis_C.pt".format(
@@ -95,10 +95,7 @@ def create_data_set(dataset_param_dict):
 
     print("Data set created at " + filename)
 
-
-
 ###
-
 
 data_set_generation_param_dict = {
     "eb_n0_db": 10,
