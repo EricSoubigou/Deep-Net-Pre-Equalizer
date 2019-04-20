@@ -16,7 +16,7 @@ class Equalizer:
 
     def equalize(self, symbols_to_equalize):
         """ Equalizes the received frame
-        :symbols_to_equalize: A 2D-float-array, with the symbol to equalize
+        :param symbols_to_equalize: A 2D-float-array, with the symbol to equalize
         """
         return np.divide(symbols_to_equalize, self.estimation)
 
@@ -34,7 +34,7 @@ class ZeroForcing(Equalizer):
 
     def estimate(self, received_pilot_symbols):
         """
-        :received_pilot_symbols: A 1D-complex-array, containing the signal samples of the
+        :parma received_pilot_symbols: A 1D-complex-array, containing the signal samples of the
             received pilot symbols.
         """
         self.estimation = np.divide(
@@ -42,10 +42,17 @@ class ZeroForcing(Equalizer):
             np.power(np.abs(self.pilot_symbols), 2),
         )
 
+    def equalize(self, symbols_to_equalize):
+        """ Equalizes the received frame
+        :param symbols_to_equalize: A 2D-float-array, with the symbol to equalize
+        """
+        return np.divide(symbols_to_equalize, self.estimation)
+
+
 
 class MMSE(Equalizer):
     """ MMSE equalizers class
-    :noise_var_est: A float, value of the gaussian noise variance.
+    :param noise_var_est: A float, value of the gaussian noise variance.
     """
 
     def __init__(self, pilot_symbols):
@@ -55,7 +62,7 @@ class MMSE(Equalizer):
 
     def estimate(self, received_pilot_symbols):
         """ Estimate the channel taps following the MMSE principles
-        :received_pilot_symbols: A 1D-complex-array, containing the signal samples of the
+        :param received_pilot_symbols: A 1D-complex-array, containing the signal samples of the
             received pilot symbols.
         """
         self.estimation = np.divide(
@@ -65,9 +72,20 @@ class MMSE(Equalizer):
 
     def set_noise_var(self, noise_var_est):
         """ Set the value of the gaussian noise variance
-        :noise_var_est: A float, value of the noise variance estimated.
+        :param noise_var_est: A float, value of the noise variance estimated.
         """
         self._noise_var_est = noise_var_est
+
+    def equalize(self, symbols_to_equalize):
+        """ Equalizes the received frame
+        :param symbols_to_equalize: A 2D-float-array, with the symbol to equalize
+        """
+
+        return np.divide(
+            np.multiply(symbols_to_equalize, np.conjugate(self.estimation)),
+            np.linalg.norm(self.estimation) ** 2 + self._noise_var_est,
+        )
+
 
 
 class NnEqualizer(Equalizer):
