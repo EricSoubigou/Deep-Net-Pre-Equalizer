@@ -79,35 +79,4 @@ def create_data_set(dataset_param_dict):
     OFDMSamplesDataset.save(samples, targets, filename)
 
 
-###
-
-data_set_generation_param_dict = {
-    "eb_n0_db": 10,
-    "channel_parameters": {
-        "non_lin_coeff": 0,
-        "iq_imbalance": None,
-        "channel_taps": np.array([1, 2, 3, 2, 1]),
-    },
-    "frame_length": 1000,
-    "modulation": {
-        "modulation_order": 4,
-        "nb_carriers": 64,
-        "cp_length": 8,
-        "off_carrier": 0,
-    },
-    "equalizer": "MMSE",
-    "channel_coding": {
-        "mem_size": np.array([2]),
-        "g_matrix": np.array([[0o5, 0o7]]),
-        "rho": 1 / 2,  #  Coding rate
-    },
-}
-
-if __name__ == '__main__':
-    create_data_set(data_set_generation_param_dict)
-
-    # Load the data set using the Dataset class
-    data_set = OFDMSamplesDataset("./data_set/OFDM_non_lin_coeff_0_iq_im_None_eb_n0_10_proakis_C.pt")
-
-    print(data_set.get_dimensions())
 

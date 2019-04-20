@@ -10,8 +10,8 @@ simulation_param_dict = {
     },
     "channel_parameters": {
         "non_lin_coeff": 0,
-        "iq_imbalance": 1/3,
-        "channel_taps": np.array([1]),
+        "iq_imbalance": None,
+        "channel_taps": np.array([1, 2, 3, 2, 1]),
     },
     "frame_length": 256,
     "modulation": {

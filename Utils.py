@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import pickle
 
 
 def is_power_of_2(num):
@@ -61,3 +62,32 @@ def reshape_1D_to_OFDM(cp_length, nb_carriers, frame):
     """
     nb_ofdm_group = len(frame) // (cp_length + nb_carriers)
     return np.reshape(frame, (nb_ofdm_group, (cp_length + nb_carriers),), )
+
+
+def load_results(pickle_path):
+    """
+
+    :param pickle_path: A string, containing the path to the pickle results file
+    :return:
+    """
+    with open(pickle_path, "rb") as handle:
+        return pickle.load(handle)
+
+def plot_ber(eb_n0, ber):
+    """
+    Plot the performances of a system given its eb_n0 and ber vector.
+    :param eb_n0:
+    :param ber:
+    """
+    plt.plot(eb_n0, ber, "r")
+    plt.yscale("log")
+    plt.title("BER results")
+    plt.xlabel("Eb/N0 (dB)")
+    plt.ylabel("BER")
+    plt.grid(True)
+    plt.show()
+
+
+def plot_performance(dicts):
+    # Get the number of dictionaries in the arguments
+

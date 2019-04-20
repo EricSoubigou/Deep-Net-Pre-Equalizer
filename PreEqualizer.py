@@ -68,23 +68,26 @@ class PreEqualizer(nn.Module):
     # Static Methods
 
     @staticmethod
-    def train(pre_equalizer, received_symb, targeted_symb, nb_epochs, sgd_step=0.01):
+    def train(pre_equalizer, samples, targets, nb_epochs, sgd_step=0.01):
         """ To train the NN pre-equalizer.
         :pre_equalizer: A Pre_Equalizer, the one which will be trained
-        :received_symb: A 1D array, received symbols from the OFDM
-        :targeted_symb: A 1D array of the targeted symbols before the
-            demaping process
+        :param samples: A 1D array, received symbols from the OFDM
+        :param targets: A 1D array of the targeted symbols before the
+            de-mapping process
+        :param nb_epochs: A positive integer, number of epochs that will performed
+        during the training process
         TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         """
         optimizer = optim.SGD(pre_equalizer.parameters(), lr=sgd_step)
-        # Loop on the number of epcohs
+        # Loop on the number of epochs
         for epoch in range(nb_epochs):
-            for i, mini_batch in enumerate(data, 0):
+            # Loop on the mini batch
+            for i, mini_batch in enumerate(samples, 0):
                 # Zero the gradient buffers
                 optimizer.zero_grad()
                 # Perform the forward operation
-                pre_eq_symbols = pre_equalizer.forward(received_symb)
+                pre_eq_symbols = pre_equalizer.forward(samples)
                 # Launch the backward function
-                pre_equalizer.backpropagation(pre_eq_symbols, targeted_symb)
+                pre_equalizer.backpropagation(pre_eq_symbols, targets)
                 # Perform update of the gradient
                 optimizer.step()
