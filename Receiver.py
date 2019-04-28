@@ -58,7 +58,8 @@ class Receiver:
         if trellis is not None:
             self.dec_trellis = trellis
         else:
-            print("trellis is not defined")
+            self.dec_trellis = None
+            print("trellis is not defined -> There will have no decoding")
 
         # Instanciate the Equalizer
         if equalizer_type is not None:
@@ -122,7 +123,10 @@ class Receiver:
         """ Decoding an encoded frame according to the trellis of the receiver.
         :enc_frame: A 1D float array, encoded frame to decode.
         """
-        # Decode the received frame according to the trellis
-        return cp.channelcoding.viterbi_decode(
-            enc_frame, self.dec_trellis, decoding_type="hard"  # , tb_length=15
-        )
+        if self.dec_trellis is not None :
+            # Decode the received frame according to the trellis
+            return cp.channelcoding.viterbi_decode(
+                enc_frame, self.dec_trellis, decoding_type="hard"  # , tb_length=15
+            )
+        else:
+            return enc_frame

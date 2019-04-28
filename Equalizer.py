@@ -46,8 +46,10 @@ class ZeroForcing(Equalizer):
         """ Equalizes the received frame
         :param symbols_to_equalize: A 2D-float-array, with the symbol to equalize
         """
-        return np.divide(symbols_to_equalize, self.estimation)
-
+        return np.divide(
+            np.multiply(symbols_to_equalize, np.conjugate(self.estimation)),
+            np.power(np.abs(self.estimation), 2),
+        )
 
 
 class MMSE(Equalizer):
@@ -82,16 +84,20 @@ class MMSE(Equalizer):
         """
 
         return np.divide(
-            np.multiply(symbols_to_equalize, np.conjugate(self.estimation)),
-            np.linalg.norm(self.estimation) ** 2 + self._noise_var_est,
+            np.multiply(
+                symbols_to_equalize,
+                np.conjugate(self.estimation)
+            ),
+            np.linalg.norm(self.estimation) ** 2
+            + self._noise_var_est,
         )
-
 
 
 class NnEqualizer(Equalizer):
     """
     TODO !!!!!
     """
+
     def __init__(self, pilot_symbols):
         super().__init__(pilot_symbols)
         self._name = "Zero-Forcing"

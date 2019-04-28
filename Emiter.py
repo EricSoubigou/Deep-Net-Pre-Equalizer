@@ -60,7 +60,8 @@ class Emiter:
         if trellis is not None:
             self.enc_trellis = trellis
         else:
-            print("trellis is not defined")
+            self.enc_trellis = None
+            print("Trellis is not defined -> There will have no encoding")
 
     def get_trellis(self):
         """ Return the copy of trellis of the emiter
@@ -126,5 +127,9 @@ class Emiter:
         """ Encode the bit frame according to the defined trellis of the emiter
         :frame: The frame that has to be encoded.
         """
-        # Channel coding of the frame
-        return cp.channelcoding.conv_encode(frame, self.enc_trellis)
+        # Channel coding of the frame if there is a trellis
+        if self.enc_trellis is not None:
+            return cp.channelcoding.conv_encode(frame, self.enc_trellis)
+        else:
+            # In the case where there is no coding
+            return frame
