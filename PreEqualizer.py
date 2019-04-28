@@ -5,6 +5,8 @@ import torch.nn.functional as F
 
 from torch import optim
 
+import sys
+
 from Utils import *
 
 
@@ -14,80 +16,93 @@ class PreEqualizer(nn.Module):
     """
 
     def __init__(self, symb_nb):
-        super(Net, self).__init__()
+        """
+        Init the object of PreEqualizer
+        :param symb_nb: A positive integer, number of symbols in an OFDM Symbols (ie. nb_carriers
+            + cp_length + off_carriers)
+        """
+        super(PreEqualizer, self).__init__()
         # Set the loss as the MSE loss function. (Not the Cross entropy)
-        self.loss_function = nn.MSELoss
+        self.loss_function = nn.MSELoss()
         # Number of symbols accepted in the entry of the neural network
         self.symb_nb = symb_nb
         #  Fully connected layers
         self.fc1 = nn.Linear(2 * self.symb_nb, 256)
-        self.fc2 = nn.Linear(2 * self.symb_nb, 256)
-        self.fc3 = nn.Linear(2 * self.symb_nb, 256)
+        self.fc2 = nn.Linear(256, 256)
+        self.fc3 = nn.Linear(256, 2 * self.symb_nb)
         # Init trainable scalar
-        self.alpha = torch.randn(1, 1)
+        self.alpha = nn.Parameter(torch.randn(1, 1))
 
     def forward(self, symbols):
         """ Perform the feedforward process
-        :symbols: A 1D float array, containing the symbols to pre-equalize
+        :param symbols: A 1D float array, containing the symbols to pre-equalize
         """
-        # First, adapat the input to the Neural network this means that we
-        # have to handle the case where there is the CP
-        pre_equ_symbols = np.array(symbols.shape, dtype=complex)
-        # Loop on the different chunk of the signal
-        for i in range(len(symbols) / self.symb_nb):
-            # Convert the complex array to a 2D real array
-            formated_symb = from_complex_to_real(
-                symbols[i * self.symb_nb: (i + 1) * self.symb_nb]
-            )
-            # Then feed the neural network with the adapted symbol
-            out_1 = F.relu(self.fc1(formated_symb))
-            out_2 = F.relu(self.fc2(out_1))
-            out_3 = F.linear(self.fc3(out_2))
-            # Convert the output to a complex vector.
-            pre_equ_symbols[
-            i * self.symb_nb: (i + 1) * self.symb_nb
-            ] = from_real_to_complex(out_3)
-        # Lastly we sum the complex input with the weighted output of the network
-        return symbols + self.alpha * pre_equ_symbols
-
-    def backpropagation(self, output_symb, targeted_symb):
-        """ Use to perform the back propagation update
-        :output_symb:
-        :targeted_symb:
-        """
-        loss = self.loss_function(output_symb, targeted_symb)
-        loss.backward()
+        # We get through the neural net
+        out_1 = F.relu(self.fc1(symbols))
+        out_2 = F.relu(self.fc2(out_1))
+        out_3 = self.fc3(out_2)
+        # Multiply by a constant
+        symbols = symbols + self.alpha * out_3
+        return symbols
 
     def feedback_update(self, x_hat):
         """ Perform a SGD to update the weights given the results of
         the viterbi decoder
-        :x_hat: TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        :param x_hat: TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         """
         x_hat = 1
 
     # Static Methods
 
     @staticmethod
-    def train(pre_equalizer, samples, targets, nb_epochs, sgd_step=0.01):
+    def train(pre_equalizer, training_data_loader, validation_data_loader, nb_epochs, sgd_step=0.001):
         """ To train the NN pre-equalizer.
-        :pre_equalizer: A Pre_Equalizer, the one which will be trained
-        :param samples: A 1D array, received symbols from the OFDM
-        :param targets: A 1D array of the targeted symbols before the
-            de-mapping process
+        :param pre_equalizer: A Pre_Equalizer, the one which will be trained
+        :param data_loader: A DataLoader, create the mini batch for the training
         :param nb_epochs: A positive integer, number of epochs that will performed
         during the training process
-        TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         """
-        optimizer = optim.SGD(pre_equalizer.parameters(), lr=sgd_step)
+        # Loss vector init
+        val_loss, train_loss = np.zeros((nb_epochs,1)), np.zeros((nb_epochs,1))
+        # Init optimizer
+        optimizer = optim.Adam(pre_equalizer.parameters(), lr=sgd_step)
         # Loop on the number of epochs
         for epoch in range(nb_epochs):
-            # Loop on the mini batch
-            for i, mini_batch in enumerate(samples, 0):
+            # Loop on the training data set
+            for batch_idx, (samples, targets) in enumerate(training_data_loader):
                 # Zero the gradient buffers
                 optimizer.zero_grad()
                 # Perform the forward operation
                 pre_eq_symbols = pre_equalizer.forward(samples)
                 # Launch the backward function
-                pre_equalizer.backpropagation(pre_eq_symbols, targets)
+                loss = pre_equalizer.loss_function(pre_eq_symbols, targets)
+                loss.backward()
                 # Perform update of the gradient
                 optimizer.step()
+            # Print loss
+            sys.stdout.write("\rEpoch {}/{}; training MSE : {}".format(str(epoch + 1), str(nb_epochs), str(loss.item())))
+            train_loss[epoch] = loss.item()
+
+            # Launch on the validation data loader
+            for batch_idx, (val_samples, val_targets) in enumerate(validation_data_loader):
+                # Perform the forward operation
+                pre_eq_symbols = pre_equalizer.forward(val_samples)
+                # Launch the backward function
+                validation_loss = pre_equalizer.loss_function(pre_eq_symbols, val_targets)
+            # Print validation loss
+            sys.stdout.write("; validation MSE : {}".format(str(validation_loss.item())))
+            val_loss[epoch] = validation_loss.item()
+
+        # Print the MSE in function of the epoch
+        plt.plot(np.linspace(0, nb_epochs, nb_epochs), val_loss, "b")
+        plt.plot(np.linspace(0, nb_epochs, nb_epochs), train_loss, "r")
+        #plt.yscale("log")
+        plt.title("MSE loss performances")
+        plt.xlabel("Epochs")
+        plt.ylabel("MSE")
+        plt.grid(True)
+        plt.show()
+
+
+
+
