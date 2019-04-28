@@ -94,14 +94,18 @@ class PreEqualizer(nn.Module):
             val_loss[epoch] = validation_loss.item()
 
         # Print the MSE in function of the epoch
-        plt.plot(np.linspace(0, nb_epochs, nb_epochs), val_loss, "b")
-        plt.plot(np.linspace(0, nb_epochs, nb_epochs), train_loss, "r")
+        plt.plot(np.linspace(0, nb_epochs, nb_epochs), val_loss, "b", label="Validation loss")
+        plt.plot(np.linspace(0, nb_epochs, nb_epochs), train_loss, "r", label="Training loss")
         #plt.yscale("log")
         plt.title("MSE loss performances")
         plt.xlabel("Epochs")
         plt.ylabel("MSE")
         plt.grid(True)
+        plt.legend()
         plt.show()
+
+
+        #@staticmethod
 
 
 
