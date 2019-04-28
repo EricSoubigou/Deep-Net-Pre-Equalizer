@@ -64,10 +64,10 @@ def create_data_set(dataset_param_dict):
 
     samples = reshape_1D_to_OFDM(dataset_param_dict["modulation"]["cp_length"],
                                  dataset_param_dict["modulation"]["nb_carriers"],
-                                 mod_frame)
+                                 channel_frame)
     targets = reshape_1D_to_OFDM(dataset_param_dict["modulation"]["cp_length"],
                                  dataset_param_dict["modulation"]["nb_carriers"],
-                                 channel_frame)
+                                 mod_frame)
 
     # Save results in file
     filename = "./data_set/OFDM_non_lin_coeff_{}_iq_im_{}_eb_n0_{}_proakis_C.pt".format(

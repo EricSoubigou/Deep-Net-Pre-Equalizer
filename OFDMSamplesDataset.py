@@ -1,7 +1,8 @@
 from torch.utils.data import Dataset
 
+import torch
 import numpy as np
-
+from Utils import from_complex_to_real
 
 class OFDMSamplesDataset(Dataset):
     """
@@ -39,7 +40,9 @@ class OFDMSamplesDataset(Dataset):
         :param index: A positive integer, index of the OFDM symbol in the data set
         :return: A tuple of complex numpy.array
         """
-        return self.samples[index, :], self.targeted_samples[index, :]
+
+        return (torch.from_numpy(from_complex_to_real(self.samples[index, :])).float(),
+                torch.from_numpy(from_complex_to_real(self.targeted_samples[index, :])).float())
 
     def get_number_of_carriers(self):
         """

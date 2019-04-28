@@ -35,8 +35,7 @@ def from_real_to_complex(symbols):
     :param symbols: A 2D-real array, containing the value of symbols.
     """
     # Init of the vector
-    # cmplx = np.array((1, np.round(len(symbols) / 2)), dtype=complex)
-    return symbols[0:2:] + 1j * symbols[1:2:]
+    return symbols[:,0:symbols.shape[1] // 2] + 1j * symbols[:,symbols.shape[1] // 2 :]
 
 
 def from_complex_to_real(symbols):
@@ -45,10 +44,7 @@ def from_complex_to_real(symbols):
     with alternate real/imag part of the symbols
     :param symbols: A 1D-complex array, containing the value of symbols.
     """
-    print("cat shape", np.concatenate((np.real(symbols), np.imag(symbols)), axis=1).shape)
-    print('separated vector', np.real(symbols).shape, np.imag(symbols).shape)
-    x = np.ravel(np.concatenate((np.real(symbols), np.imag(symbols)), axis=1))
-    print("x shape", x.shape)
+    x = np.concatenate((np.real(symbols), np.imag(symbols)))
     return x
 
 
@@ -66,7 +62,7 @@ def reshape_1D_to_OFDM(cp_length, nb_carriers, frame):
 
 def load_results(pickle_path):
     """
-
+    Load performances results of a simulation
     :param pickle_path: A string, containing the path to the pickle results file
     :return:
     """
@@ -89,5 +85,9 @@ def plot_ber(eb_n0, ber):
 
 
 def plot_performance(dicts):
-    # Get the number of dictionaries in the arguments
+    """
 
+    :param dicts:
+    :return: Nop
+    """
+    # Get the number of dictionaries in the arguments
