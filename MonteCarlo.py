@@ -39,10 +39,15 @@ def monte_carlo_simulation(sim_param_dict):
     )
 
     # Creation of the trellis
-    trellis = Trellis(
-        sim_param_dict["channel_coding"]["mem_size"],
-        sim_param_dict["channel_coding"]["g_matrix"],
-    )
+    if sim_param_dict["channel_coding"]["rho"] != 1:
+        print("rho value is ", sim_param_dict["channel_coding"]["rho"])
+        trellis = Trellis(
+            sim_param_dict["channel_coding"]["mem_size"],
+            sim_param_dict["channel_coding"]["g_matrix"],
+        )
+    else:
+        # No coding
+        trellis = None
 
     # Creation of the emiter
     emiter = Emiter(
@@ -73,8 +78,9 @@ def monte_carlo_simulation(sim_param_dict):
     )
 
     # File name creation
-    filename = "./results/OFDM_eq_{}_non_lin_coeff_{}_iq_im_{}_snr_{}_to_{}_step_{}.pickle".format(
+    filename = "./results/OFDM_eq_{}_coding_{}_non_lin_coeff_{}_iq_im_{}_snr_{}_to_{}_step_{}.pickle".format(
         str(sim_param_dict["equalizer"]),
+        str(sim_param_dict["channel_coding"]["rho"]),
         str(sim_param_dict["channel_parameters"]["non_lin_coeff"]),
         str(sim_param_dict["channel_parameters"]["iq_imbalance"]),
         str(sim_param_dict["m_c_parameters"]["min_eb_n0"]),
