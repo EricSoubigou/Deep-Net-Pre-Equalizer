@@ -93,18 +93,6 @@ class MMSE(Equalizer):
         )
 
 
-class NnEqualizer(Equalizer):
-    """
-    TODO !!!!!
-    """
-
-    def __init__(self, pilot_symbols):
-        super().__init__(pilot_symbols)
-        self._name = "Zero-Forcing"
-
-        # Instantiate the neural network
-
-
 def switch_init_equalizer(equalizer_name, pilot_symbols):
     """ Instantiate the wanted equalizer given the name of the equalizer
     """
