@@ -66,6 +66,7 @@ def monte_carlo_simulation(sim_param_dict):
         trellis=trellis,
         nb_off_carriers=sim_param_dict["modulation"]["off_carrier"],
         equalizer_type=sim_param_dict["equalizer"],
+        pre_eqaulizer=sim_param_dict["model_path"],
     )
 
     # Creation of the AWGN Channel
