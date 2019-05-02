@@ -44,8 +44,13 @@ def from_complex_to_real(symbols):
     with alternate real/imag part of the symbols
     :param symbols: A 1D-complex array, containing the value of symbols.
     """
-    x = np.concatenate((np.real(symbols), np.imag(symbols)))
-    return x
+    #print("The length of symbols shape is : ",len(symbols.shape))
+    if len(symbols.shape) == 1:
+        #print("Len 1")
+        return np.concatenate((np.real(symbols), np.imag(symbols)))
+    else:
+        #print("Len ", len(symbols.shape))
+        return np.concatenate((np.real(symbols), np.imag(symbols)), axis=1)
 
 
 def reshape_1D_to_OFDM(cp_length, nb_carriers, frame):

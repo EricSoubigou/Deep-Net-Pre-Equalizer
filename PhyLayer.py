@@ -2,15 +2,18 @@
 
 class PhyLayer:
     """ PHY layer class
-    :emiter: An Emiter, emiter of the Phy layer
-    :receiver: An Receiver, receiver of the Phy layer
-    :channel: A Channel,
+    :param emiter: An Emiter, emiter of the Phy layer
+    :param receiver: An Receiver, receiver of the Phy layer
+    :param channel: A Channel, which simulate the effect of the channel
+    :param feedback_freq: An integer, frequency of the feedback update (if feedback_freq == 0)
     """
 
-    def __init__(self, emiter, receiver, channel):
+    def __init__(self, emiter, receiver, channel, feedback_freq=0):
         self.emiter = emiter
         self.receiver = receiver
         self.channel = channel
+        self.feedback_freq = feedback_freq
+        self.feedback_counter = 0
 
     def process_frame(self, frame):
         # Encode the frame
@@ -21,9 +24,17 @@ class PhyLayer:
         channel_frame = self.channel.get_trough(mod_frame)
         # Demodulation of the received frame
         demod_frame = self.receiver.demodulate_frame(channel_frame, demod_type="hard")
-        # Shrink for convinience
-        demod_frame = demod_frame[: len(enc_frame)]
+        # Shrink for convenience
+        demod_frame_shrinked = demod_frame[: len(enc_frame)]
         # Decoding frame
-        dec_frame = self.receiver.decode(demod_frame)
+        dec_frame = self.receiver.decode(demod_frame_shrinked)
         # Shrink the last part of the decoded frame before comparing the results
-        return dec_frame[: len(frame)]
+        dec_frame = dec_frame[: len(frame)]
+        # Check if we perform a feedback update and
+        if (self.feedback_freq != 0) and (self.feedback_counter == 0):
+            # Update the counter
+            self.feedback_counter = (self.feedback_counter + 1) % self.feedback_freq
+            # Perform the feedback update
+            dec_frame = self.receiver.feedback(dec_frame)
+        # Return the decoded frame
+        return dec_frame

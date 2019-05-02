@@ -9,10 +9,11 @@ from Channel import *
 from PhyLayer import *
 
 
-def monte_carlo_simulation(sim_param_dict):
+def monte_carlo_simulation(sim_param_dict, add_on_path=""):
     """ Perform the global simulation having the dictionary of parameters.
 
-    :sim_param_dict: A dictionnary containing all parameters necessary for the simualtion
+    :param sim_param_dict: A dictionary containing all parameters necessary
+        for the simulation
     """
 
     max_test = (
@@ -66,7 +67,7 @@ def monte_carlo_simulation(sim_param_dict):
         trellis=trellis,
         nb_off_carriers=sim_param_dict["modulation"]["off_carrier"],
         equalizer_type=sim_param_dict["equalizer"],
-        pre_eqaulizer=sim_param_dict["model_path"],
+        pre_equalizer_path=sim_param_dict["pre-equalizer"]["model_path"],
     )
 
     # Creation of the AWGN Channel
@@ -79,7 +80,7 @@ def monte_carlo_simulation(sim_param_dict):
     )
 
     # File name creation
-    filename = "./results/OFDM_eq_{}_coding_{}_non_lin_coeff_{}_iq_im_{}_snr_{}_to_{}_step_{}.pickle".format(
+    filename = "./results/OFDM_eq_{}_coding_{}_non_lin_coeff_{}_iq_im_{}_snr_{}_to_{}_step_{}_{}.pickle".format(
         str(sim_param_dict["equalizer"]),
         str(sim_param_dict["channel_coding"]["rho"]),
         str(sim_param_dict["channel_parameters"]["non_lin_coeff"]),
@@ -87,10 +88,11 @@ def monte_carlo_simulation(sim_param_dict):
         str(sim_param_dict["m_c_parameters"]["min_eb_n0"]),
         str(sim_param_dict["m_c_parameters"]["max_eb_n0"]),
         str(sim_param_dict["m_c_parameters"]["step_db"]),
+        add_on_path,
     )
 
     # Creation of the PHY Layer
-    phy_layer = PhyLayer(emiter, receiver, awgn_channel)
+    phy_layer = PhyLayer(emiter, receiver, awgn_channel, sim_param_dict["pre-equalizer"]["feed_back_freq"])
 
     nb_tries = 0
     ind_eb_n0 = 0

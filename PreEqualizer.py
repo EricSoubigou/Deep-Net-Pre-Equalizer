@@ -21,7 +21,7 @@ class PreEqualizer(nn.Module):
         :param symb_nb: A positive integer, number of symbols in an OFDM Symbols (ie. nb_carriers
             + cp_length + off_carriers)
         """
-        super(PreEqualizer, self).__init__()
+        super().__init__() #PreEqualizer, self
         # Set the loss as the MSE loss function. (Not the Cross entropy)
         self.loss_function = nn.MSELoss()
         # Number of symbols accepted in the entry of the neural network
@@ -45,15 +45,26 @@ class PreEqualizer(nn.Module):
         symbols = symbols + self.alpha * out_3
         return symbols
 
-    def feedback_update(self, x_hat):
+    def feedback_update(self, estimates, targets, sgd_step=0.001):
         """ Perform a SGD to update the weights given the results of
-        the viterbi decoder
-        :param x_hat: TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        the Viterbi decoder
+        TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         """
-        x_hat = 1
+        # Convert the data into readable
+        #estimates = torch.from_numpy(from_complex_to_real(estimates)).float()
+        targets = torch.from_numpy(from_complex_to_real(targets)).float()
+        # Define an optimizer
+        optimizer = optim.Adam(self.parameters(), lr=sgd_step)
+        # Perform the backward function
+        #print("estimates size ", estimates.size(), "targets size ", targets.size())
+        loss = self.loss_function(estimates, targets)
+        loss.backward()
+        # Perform update of the gradient
+        optimizer.step()
+        # Zero the gradient buffers
+        optimizer.zero_grad()
 
     # Static Methods
-
     @staticmethod
     def train(pre_equalizer, training_data_loader, validation_data_loader, nb_epochs, sgd_step=0.001):
         """ To train the NN pre-equalizer.
@@ -74,7 +85,7 @@ class PreEqualizer(nn.Module):
                 optimizer.zero_grad()
                 # Perform the forward operation
                 pre_eq_symbols = pre_equalizer.forward(samples)
-                # Launch the backward function
+                # Perform the backward function
                 loss = pre_equalizer.loss_function(pre_eq_symbols, targets)
                 loss.backward()
                 # Perform update of the gradient

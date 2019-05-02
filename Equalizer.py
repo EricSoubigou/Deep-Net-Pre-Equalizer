@@ -51,6 +51,18 @@ class ZeroForcing(Equalizer):
             np.power(np.abs(self.estimation), 2),
         )
 
+    def de_equalize(self, symbols_to_de_equalize):
+        """
+        Perform the de-equalization of symbols. (This function was needed to
+        perform the feedback update of the pre-equalizer
+        :param symbols_to_de_equalize:
+        :return: de-equalized symbols
+        """
+        return np.divide(
+            np.multiply(symbols_to_de_equalize, np.power(np.abs(self.estimation), 2)),
+            np.conjugate(self.estimation),
+        )
+
 
 class MMSE(Equalizer):
     """ MMSE equalizers class
@@ -82,7 +94,6 @@ class MMSE(Equalizer):
         """ Equalizes the received frame
         :param symbols_to_equalize: A 2D-float-array, with the symbol to equalize
         """
-
         return np.divide(
             np.multiply(
                 symbols_to_equalize,
@@ -90,6 +101,22 @@ class MMSE(Equalizer):
             ),
             np.linalg.norm(self.estimation) ** 2
             + self._noise_var_est,
+        )
+
+    def de_equalize(self, symbols_to_de_equalize):
+        """
+        Perform the de-equalization of symbols. (This function was needed to
+        perform the feedback update of the pre-equalizer
+        :param symbols_to_de_equalize:
+        :return: de-equalized symbols
+        """
+        return np.divide(
+            np.multiply(
+                symbols_to_de_equalize,
+                np.linalg.norm(self.estimation) ** 2
+                + self._noise_var_est
+            ),
+            np.conjugate(self.estimation)
         )
 
 
