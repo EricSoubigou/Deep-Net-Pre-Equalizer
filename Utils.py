@@ -110,7 +110,7 @@ def plot_performance(dict_list):
         plt.plot(dict["results"]["eb_n0_db"],
                  dict["results"]["ber"],
                  color=color,
-                 label=str(dict["sim_param"]["equalizer"] + pre_equalizer))
+                 label=str(dict["sim_param"]["equalizer"] + " " + pre_equalizer))
     # Finalize the legend
     plt.yscale("log")
     plt.title("BER results on" + dict["sim_param"]["channel_parameters"]["channel_type"])
