@@ -1,5 +1,8 @@
 import numpy as np
+
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+
 import pickle
 
 
@@ -95,18 +98,22 @@ def plot_performance(dict_list):
     :param dict_list: An list, containing all the performances of the
     """
     # Begin the plot
-    for idx_plot in range(len(dict_list)):
-        print(dict_list[idx_plot])
-        if dict_list[idx_plot]["pre-equalizer"]["model_path"] is not None:
+    colors = cm.rainbow(np.linspace(0, 1, len(dict_list)))
+    # Loop on different performances dicts
+    for dict, color in zip(dict_list, colors):
+        # Test wether there is an equalizer or not.
+        if dict["sim_param"]["pre_equalizer"]["model_path"] is not None:
             pre_equalizer = "pre_equalizer"
         else:
             pre_equalizer = ""
-        plt.plot(dict_list[idx_plot]["results"]["eb_n0_db"],
-                 dict_list[idx_plot]["results"]["ber"],
-                 label=str(dict_list[idx_plot]["equalizer"] + pre_equalizer))
-
+        # Plot the performances
+        plt.plot(dict["results"]["eb_n0_db"],
+                 dict["results"]["ber"],
+                 color=color,
+                 label=str(dict["sim_param"]["equalizer"] + pre_equalizer))
+    # Finalize the legend
     plt.yscale("log")
-    plt.title("BER results")
+    plt.title("BER results on" + dict["sim_param"]["channel_parameters"]["channel_type"])
     plt.xlabel("Eb/N0 (dB)")
     plt.ylabel("BER")
     plt.grid(True)
@@ -122,8 +129,8 @@ def generate_path_name_from_param_dict(sim_param_dict, add_on_path):
     :return: A string,
     """
     # Check if there is a pre-equalizer or not
-    if sim_param_dict["pre-equalizer"]["model_path"] is not None:
-        pre_equalizer = "pre_equalizer_update_" + str(sim_param_dict["pre-equalizer"]["feed_back_freq"])
+    if sim_param_dict["pre_equalizer"]["model_path"] is not None:
+        pre_equalizer = "pre_equalizer_update_" + str(sim_param_dict["pre_equalizer"]["feed_back_freq"])
     else:
         pre_equalizer = ""
 

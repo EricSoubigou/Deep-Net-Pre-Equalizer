@@ -67,7 +67,7 @@ def monte_carlo_simulation(sim_param_dict, add_on_path=""):
         trellis=trellis,
         nb_off_carriers=sim_param_dict["modulation"]["off_carrier"],
         equalizer_type=sim_param_dict["equalizer"],
-        pre_equalizer_path=sim_param_dict["pre-equalizer"]["model_path"],
+        pre_equalizer_path=sim_param_dict["pre_equalizer"]["model_path"],
     )
 
     # Creation of the AWGN Channel
@@ -84,7 +84,7 @@ def monte_carlo_simulation(sim_param_dict, add_on_path=""):
     print("Results will be printed in : ", filename)
 
     # Creation of the PHY Layer
-    phy_layer = PhyLayer(emiter, receiver, awgn_channel, sim_param_dict["pre-equalizer"]["feed_back_freq"])
+    phy_layer = PhyLayer(emiter, receiver, awgn_channel, sim_param_dict["pre_equalizer"]["feed_back_freq"])
 
     nb_tries = 0
     ind_eb_n0 = 0
@@ -154,6 +154,7 @@ def monte_carlo_simulation(sim_param_dict, add_on_path=""):
         with open(filename, "wb") as handle:
             pickle.dump(ber_dict, handle)
 
+    # TODO : Use the function of utils when they will be well-implemented
     # Display results figures
     plt.plot(eb_n0_db, ber, "b")
     plt.yscale("log")
