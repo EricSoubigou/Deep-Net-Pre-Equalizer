@@ -179,7 +179,7 @@ class Receiver:
 
     def modulate_frame(self, frame):
         """
-        Modulate and Map the frame. In other words, will perform the
+        Modulate and map the frame. In other words, will perform the
         Modulation and the Mapping and then perform the OFDM transformation before
         sending the data. This function was developed to perform the feedback loop and get the inverse transform
         :param frame: The frame that has to be modulated.

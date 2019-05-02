@@ -89,10 +89,55 @@ def plot_ber(eb_n0, ber):
     plt.show()
 
 
-def plot_performance(dicts):
+def plot_performance(dict_list):
     """
+    Plot the different performances in dict according a criteria
+    :param dict_list: An list, containing all the performances of the
+    """
+    # Begin the plot
+    for idx_plot in range(len(dict_list)):
+        print(dict_list[idx_plot])
+        if dict_list[idx_plot]["pre-equalizer"]["model_path"] is not None:
+            pre_equalizer = "pre_equalizer"
+        else:
+            pre_equalizer = ""
+        plt.plot(dict_list[idx_plot]["results"]["eb_n0_db"],
+                 dict_list[idx_plot]["results"]["ber"],
+                 label=str(dict_list[idx_plot]["equalizer"] + pre_equalizer))
 
-    :param dicts:
-    :return: Nop
+    plt.yscale("log")
+    plt.title("BER results")
+    plt.xlabel("Eb/N0 (dB)")
+    plt.ylabel("BER")
+    plt.grid(True)
+    plt.legend()
+    plt.show()
+
+
+def generate_path_name_from_param_dict(sim_param_dict, add_on_path):
     """
-    # Get the number of dictionaries in the arguments
+    Generate a String being the path for the performances results.
+    :param sim_param_dict:
+    :param add_on_path:
+    :return: A string,
+    """
+    # Check if there is a pre-equalizer or not
+    if sim_param_dict["pre-equalizer"]["model_path"] is not None:
+        pre_equalizer = "pre_equalizer_update_" + str(sim_param_dict["pre-equalizer"]["feed_back_freq"])
+    else:
+        pre_equalizer = ""
+
+    # File name creation
+    filename = "./results/OFDM_eq_{}_coding_{}_{}_non_lin_coeff_{}_iq_im_{}_snr_{}_to_{}_step_{}_{}.pickle".format(
+        str(sim_param_dict["equalizer"]),
+        str(sim_param_dict["channel_coding"]["rho"]),
+        sim_param_dict["channel_parameters"]["channel_type"],
+        str(sim_param_dict["channel_parameters"]["non_lin_coeff"]),
+        str(sim_param_dict["channel_parameters"]["iq_imbalance"]),
+        str(sim_param_dict["m_c_parameters"]["min_eb_n0"]),
+        str(sim_param_dict["m_c_parameters"]["max_eb_n0"]),
+        str(sim_param_dict["m_c_parameters"]["step_db"]),
+        pre_equalizer,
+        add_on_path,
+    )
+    return filename
