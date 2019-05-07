@@ -70,10 +70,11 @@ def create_data_set(dataset_param_dict):
                                  mod_frame)
 
     # Save results in file
-    filename = "./data_set/OFDM_non_lin_coeff_{}_iq_im_{}_eb_n0_{}_proakis_C.pt".format(
+    filename = "./data_set/OFDM_non_lin_coeff_{}_iq_im_{}_eb_n0_{}_{}.pt".format(
         str(dataset_param_dict["channel_parameters"]["non_lin_coeff"]),
         str(dataset_param_dict["channel_parameters"]["iq_imbalance"]),
         str(dataset_param_dict["eb_n0_db"]),
+        dataset_param_dict["channel_parameters"]["channel_type"]
     )
 
     OFDMSamplesDataset.save(samples, targets, filename)

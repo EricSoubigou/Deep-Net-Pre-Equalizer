@@ -124,14 +124,14 @@ def plot_performance(dict_list, output_path=None, max_eb_n0=None):
     plt.ylabel("BER")
     plt.grid(True)
     plt.legend()
-    # Save
-    if output_path is not None:
-        matplotlib2tikz.save(output_path)
     # Reset axes
     if max_eb_n0 is not None:
         ax = plt.gca()
         ax.set_xlim(left=0, right=max_eb_n0)
         ax.set_ylim(bottom=10**(-5))
+    # Save
+    if output_path is not None:
+        matplotlib2tikz.save(output_path)
     # Plot
     plt.show()
 
