@@ -1,7 +1,10 @@
 import numpy as np
 
+import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
+
+import matplotlib2tikz
 
 import pickle
 
@@ -92,13 +95,16 @@ def plot_ber(eb_n0, ber):
     plt.show()
 
 
-def plot_performance(dict_list):
+def plot_performance(dict_list, output_path=None, max_eb_n0=None):
     """
     Plot the different performances in dict according a criteria
     :param dict_list: An list, containing all the performances of the
     """
+
     # Begin the plot
     colors = cm.rainbow(np.linspace(0, 1, len(dict_list)))
+    # Set figure size
+    plt.figure(figsize=(10, 5))
     # Loop on different performances dicts
     for dict, color in zip(dict_list, colors):
         # Test wether there is an equalizer or not.
@@ -113,11 +119,42 @@ def plot_performance(dict_list):
                  label=str(dict["sim_param"]["equalizer"] + " " + pre_equalizer))
     # Finalize the legend
     plt.yscale("log")
-    plt.title("BER results on" + dict["sim_param"]["channel_parameters"]["channel_type"])
+    plt.title("BER results on " + dict["sim_param"]["channel_parameters"]["channel_type"])
     plt.xlabel("Eb/N0 (dB)")
     plt.ylabel("BER")
     plt.grid(True)
     plt.legend()
+    # Save
+    if output_path is not None:
+        matplotlib2tikz.save(output_path)
+    # Reset axes
+    if max_eb_n0 is not None:
+        ax = plt.gca()
+        ax.set_xlim(left=0, right=max_eb_n0)
+        ax.set_ylim(bottom=10**(-5))
+    # Plot
+    plt.show()
+
+
+def plot_training_performances(perf_dict, output_path=None):
+    """
+    Plotting performances of the given dictionary
+    :param perf_dict:
+    """
+    nb_epochs = len(perf_dict["val_loss"])
+    plt.figure(figsize=(10,5))
+    plt.plot(np.linspace(0, nb_epochs, nb_epochs), perf_dict["val_loss"], "b", label="Validation loss")
+    plt.plot(np.linspace(0, nb_epochs, nb_epochs), perf_dict["train_loss"], "r", label="Training loss")
+    plt.title("MSE loss performances")
+    plt.yscale("log")
+    plt.xlabel("Epochs")
+    plt.ylabel("MSE")
+    plt.grid(True)
+    plt.legend()
+    # Save if the path is defined
+    if output_path is not None:
+        # Save in tikz format
+        matplotlib2tikz.save(output_path)
     plt.show()
 
 

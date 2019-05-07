@@ -1,12 +1,11 @@
-"""
-    Equalizer class
-"""
 import numpy as np
 
 
 class Equalizer:
-    """ Class of Equalizers
-    :pilot_symbols: An 1D-float array, beeing the pilots symbol used to estimate
+    """
+    Class of Equalizers
+    :param pilot_symbols: An 1D-float array, beeing the pilots symbol used to estimate
+    :param estimation:
     """
 
     def __init__(self, pilot_symbols):
@@ -25,7 +24,8 @@ class Equalizer:
 
 
 class ZeroForcing(Equalizer):
-    """ Zero Forcing equalizers class
+    """
+    Zero Forcing equalizers class
     """
 
     def __init__(self, pilot_symbols):
@@ -34,7 +34,7 @@ class ZeroForcing(Equalizer):
 
     def estimate(self, received_pilot_symbols):
         """
-        :parma received_pilot_symbols: A 1D-complex-array, containing the signal samples of the
+        :param received_pilot_symbols: A 1D-complex-array, containing the signal samples of the
             received pilot symbols.
         """
         self.estimation = np.divide(
@@ -43,7 +43,8 @@ class ZeroForcing(Equalizer):
         )
 
     def equalize(self, symbols_to_equalize):
-        """ Equalizes the received frame
+        """
+        Equalizes the received frame
         :param symbols_to_equalize: A 2D-float-array, with the symbol to equalize
         """
         return np.divide(
@@ -65,7 +66,8 @@ class ZeroForcing(Equalizer):
 
 
 class MMSE(Equalizer):
-    """ MMSE equalizers class
+    """
+    MMSE equalizers class
     :param noise_var_est: A float, value of the gaussian noise variance.
     """
 

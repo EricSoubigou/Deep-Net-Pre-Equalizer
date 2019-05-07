@@ -3,7 +3,7 @@ import torch
 from commpy.channelcoding.convcode import Trellis
 
 from Receiver import *
-from Emiter import *
+from Emitter import *
 from Channel import *
 
 from OFDMSamplesDataset import *
@@ -20,7 +20,7 @@ def create_data_set(dataset_param_dict):
     )
 
     # Creation of the emiter
-    emiter = Emiter(
+    emiter = Emitter(
         cp_len=dataset_param_dict["modulation"]["cp_length"],
         nb_carriers=dataset_param_dict["modulation"]["nb_carriers"],
         modulation_order=dataset_param_dict["modulation"]["modulation_order"],

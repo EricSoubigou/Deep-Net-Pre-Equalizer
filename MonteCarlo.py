@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 from commpy.channelcoding.convcode import Trellis
 
-from Emiter import *
+from Emitter import *
 from Receiver import *
 from Channel import *
 from PhyLayer import *
@@ -51,7 +51,7 @@ def monte_carlo_simulation(sim_param_dict, add_on_path=""):
         trellis = None
 
     # Creation of the emiter
-    emiter = Emiter(
+    emiter = Emitter(
         cp_len=sim_param_dict["modulation"]["cp_length"],
         nb_carriers=sim_param_dict["modulation"]["nb_carriers"],
         modulation_order=sim_param_dict["modulation"]["modulation_order"],

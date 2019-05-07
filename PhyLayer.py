@@ -16,6 +16,12 @@ class PhyLayer:
         self.feedback_counter = 0
 
     def process_frame(self, frame):
+        """
+        Apply the sequential operations of the signal's transmission from
+        the bit stream of the emitter to the decoded bit stream to the receiver
+        :param frame:
+        :return:
+        """
         # Encode the frame
         enc_frame = self.emiter.encode(frame)
         # Modulate the frame

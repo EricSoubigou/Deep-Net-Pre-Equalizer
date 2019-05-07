@@ -1,0 +1,3 @@
+[submodule "PlotNeuralNet"]
+	path = PlotNeuralNet
+	url = https://github.com/HarisIqbal88/PlotNeuralNet.git

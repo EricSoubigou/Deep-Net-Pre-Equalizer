@@ -1,7 +1,3 @@
-"""
-  Emitter class
-"""
-
 import commpy as cp
 import copy as cpy
 
@@ -10,18 +6,19 @@ from scipy import fftpack
 from Utils import *
 
 
-class Emiter:
-    """ Class of the emiter.
+class Emitter:
+    """
+    Class of the emitter.
 
-  :cp_len: An integer, length of the cyclic-prefix of the OFDM.
-  :nb_carriers: An integer, number of sub_carrier used to transmit data.
-  :modulation_order: An integer, the modulation order.
-  :nb_off_carriers: An integer, number of off carrier in OFDM scheme
-  :trellis: A compy.channelcoding.Trellis, to encode the data
-  :pilot_frequency: A integer, number of OFDM symbols/frame before transmitting a pilot
+    :param cp_len: An integer, length of the cyclic-prefix of the OFDM.
+    :param nb_carriers: An integer, number of sub_carrier used to transmit data.
+    :param modulation_order: An integer, the modulation order.
+    :param nb_off_carriers: An integer, number of off carrier in OFDM scheme
+    :param trellis: A compy.channelcoding.Trellis, to encode the data
+    :param pilot_frequency: A integer, number of OFDM symbols/frame before transmitting a pilot
 
-  Ex : | CP | CP | OFF | OFF | ON | ON | ... | ON |
-  """
+    Ex : | CP | CP | OFF | OFF | ON | ON | ... | ON |
+    """
 
     def __init__(
             self,
@@ -64,15 +61,17 @@ class Emiter:
             print("Trellis is not defined -> There will have no encoding")
 
     def get_trellis(self):
-        """ Return the copy of trellis of the emiter
+        """
+        Return the copy of trellis of the emitter
         """
         return cpy.deepcopy(self.enc_trellis)
 
     def modulate_frame(self, frame):
-        """ Modulate and Map the frame. In other words, will perform the
-        Modulation and the Mapping and then perform the OFDM transmormation before
+        """
+        Modulate and Map the frame. In other words, will perform the
+        Modulation and the Mapping and then perform the OFDM transformation before
         sending the data.
-        :frame: The frame that has to be modulated.
+        :param frame: The frame that has to be modulated.
         """
         # Mapping of the data
         mod_frame = self.modulator.modulate(frame)
@@ -124,8 +123,9 @@ class Emiter:
         return np.ravel(ofdm_signal_cp)
 
     def encode(self, frame):
-        """ Encode the bit frame according to the defined trellis of the emiter
-        :frame: The frame that has to be encoded.
+        """
+        Encode the bit frame according to the defined trellis of the emiter
+        :param frame: The frame that has to be encoded.
         """
         # Channel coding of the frame if there is a trellis
         if self.enc_trellis is not None:

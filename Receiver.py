@@ -91,14 +91,12 @@ class Receiver:
         received_frame = np.reshape(
             frame, (nb_ofdm_group, (self.cp_len + self.nb_carriers))
         )
-        #print("received frame type is ", received_frame.shape)
-        #print("converted frame type is ", from_complex_to_real(received_frame[1, :]).shape)
 
         # We pre-equalize if possible
         if self.pre_equalizer is not None:
             # Iterate over the data set
             self.pre_eq_out = torch.Tensor(nb_ofdm_group, 2 * (self.nb_carriers + self.cp_len)).float()
-            # Cast the data into a 2 times real array and convert it into a Floar
+            # Cast the data into a 2 times real array and convert it into a Float
             # tensor to use it with the pre_equalizer
             torch_frame = torch.from_numpy(from_complex_to_real(received_frame)).float()
             # Perform the pre-equalization.

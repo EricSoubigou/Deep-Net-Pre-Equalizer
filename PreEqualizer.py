@@ -34,7 +34,8 @@ class PreEqualizer(nn.Module):
         self.alpha = nn.Parameter(torch.randn(1, 1))
 
     def forward(self, symbols):
-        """ Perform the feedforward process
+        """
+        Perform the feedforward process
         :param symbols: A 1D float array, containing the symbols to pre-equalize
         """
         # We get through the neural net
@@ -48,7 +49,9 @@ class PreEqualizer(nn.Module):
     def feedback_update(self, estimates, targets, sgd_step=0.001):
         """ Perform a SGD to update the weights given the results of
         the Viterbi decoder
-        TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        :param estimates:
+        :param targets:
+        :param sgd_step:
         """
         # Convert the data into readable
         #estimates = torch.from_numpy(from_complex_to_real(estimates)).float()
@@ -66,7 +69,7 @@ class PreEqualizer(nn.Module):
 
     # Static Methods
     @staticmethod
-    def train(pre_equalizer, training_data_loader, validation_data_loader, nb_epochs, sgd_step=0.001):
+    def train(pre_equalizer, training_data_loader, validation_data_loader, nb_epochs, path_training, sgd_step=0.001):
         """ To train the NN pre-equalizer.
         :param pre_equalizer: A Pre_Equalizer, the one which will be trained
         :param data_loader: A DataLoader, create the mini batch for the training
@@ -114,6 +117,17 @@ class PreEqualizer(nn.Module):
         plt.grid(True)
         plt.legend()
         plt.show()
+
+        performances = {
+            "val_loss" : val_loss,
+            "train_loss" : train_loss,
+        }
+
+        # Save performances
+        with open(path_training, "wb") as handle:
+            pickle.dump(performances, handle)
+
+        print("Performances of the training saved at " + path_training)
 
 
         #@staticmethod
