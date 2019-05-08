@@ -172,7 +172,7 @@ def generate_path_name_from_param_dict(sim_param_dict, add_on_path):
         pre_equalizer = ""
 
     # File name creation
-    filename = "./results/OFDM_eq_{}_coding_{}_{}_non_lin_coeff_{}_iq_im_{}_snr_{}_to_{}_step_{}_{}.pickle".format(
+    filename = "./results/OFDM_eq_{}_coding_{}_{}_non_lin_coeff_{}_iq_im_{}_snr_{}_to_{}_step_{}_{}_{}.pickle".format(
         str(sim_param_dict["equalizer"]),
         str(sim_param_dict["channel_coding"]["rho"]),
         sim_param_dict["channel_parameters"]["channel_type"],
