@@ -14,7 +14,7 @@ class OFDMSamplesDataset(Dataset):
 
     """
 
-    def __init__(self, file_path):
+    def __init__(self, file_path, *args):
         """
 
         :param file_name: A string, the file path of the data set that need to be loaded
@@ -26,6 +26,13 @@ class OFDMSamplesDataset(Dataset):
         data_set = np.load(file_path)
         self.samples = data_set[0]
         self.targeted_samples = data_set[1]
+
+        nb_data_set = len(args)
+        if nb_data_set != 0:
+            for id_set in range(nb_data_set):
+                data_set = np.load(args[id_set])
+                self.samples = np.concatenate((self.samples, data_set[0]), axis=0)
+                self.targeted_samples = np.concatenate((self.targeted_samples, data_set[1]), axis=0)
 
     def __len__(self):
         """

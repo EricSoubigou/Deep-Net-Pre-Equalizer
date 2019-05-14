@@ -4,6 +4,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 
+
 import matplotlib2tikz
 
 import pickle
@@ -95,7 +96,7 @@ def plot_ber(eb_n0, ber):
     plt.show()
 
 
-def plot_performance(dict_list, output_path=None, max_eb_n0=None):
+def plot_performance(dict_list, legend_list=None, output_path=None, max_eb_n0=None):
     """
     Plot the different performances in dict according a criteria
     :param dict_list: An list, containing all the performances of the
@@ -106,17 +107,22 @@ def plot_performance(dict_list, output_path=None, max_eb_n0=None):
     # Set figure size
     plt.figure(figsize=(10, 5))
     # Loop on different performances dicts
-    for dict, color in zip(dict_list, colors):
+    for idx, (dict, color) in enumerate(zip(dict_list, colors)):
         # Test wether there is an equalizer or not.
         if dict["sim_param"]["pre_equalizer"]["model_path"] is not None:
-            pre_equalizer = "pre_equalizer"
+            pre_equalizer = "Pre-equalizer"
         else:
             pre_equalizer = ""
+        # Test wether there is a dictionary for the legend
+        if legend_list is not None:
+            legend_add =  legend_list[idx]
+        else:
+            legend_add = ""
         # Plot the performances
         plt.plot(dict["results"]["eb_n0_db"],
                  dict["results"]["ber"],
                  color=color,
-                 label=str(dict["sim_param"]["equalizer"] + " " + pre_equalizer))
+                 label=str(dict["sim_param"]["equalizer"] + " " + pre_equalizer + " " + legend_add))
     # Finalize the legend
     plt.yscale("log")
     plt.title("BER results on " + dict["sim_param"]["channel_parameters"]["channel_type"])
@@ -136,7 +142,7 @@ def plot_performance(dict_list, output_path=None, max_eb_n0=None):
     plt.show()
 
 
-def plot_training_performances(perf_dict, output_path=None):
+def plot_training_performances(perf_dict, title_db, output_path=None):
     """
     Plotting performances of the given dictionary
     :param perf_dict:
@@ -145,7 +151,7 @@ def plot_training_performances(perf_dict, output_path=None):
     plt.figure(figsize=(10,5))
     plt.plot(np.linspace(0, nb_epochs, nb_epochs), perf_dict["val_loss"], "b", label="Validation loss")
     plt.plot(np.linspace(0, nb_epochs, nb_epochs), perf_dict["train_loss"], "r", label="Training loss")
-    plt.title("MSE loss performances")
+    plt.title("MSE loss performances for training at " + title_db)
     plt.yscale("log")
     plt.xlabel("Epochs")
     plt.ylabel("MSE")
