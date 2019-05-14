@@ -4,6 +4,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 
+import re
 
 import matplotlib2tikz
 
@@ -101,7 +102,8 @@ def plot_performance(dict_list, legend_list=None, output_path=None, max_eb_n0=No
     Plot the different performances in dict according a criteria
     :param dict_list: An list, containing all the performances of the
     """
-
+    # Generate the regex tool to extract the "_" symbol
+    sym_match = re.compile('(_)')
     # Begin the plot
     colors = cm.rainbow(np.linspace(0, 1, len(dict_list)))
     # Set figure size
@@ -125,7 +127,10 @@ def plot_performance(dict_list, legend_list=None, output_path=None, max_eb_n0=No
                  label=str(dict["sim_param"]["equalizer"] + " " + pre_equalizer + " " + legend_add))
     # Finalize the legend
     plt.yscale("log")
-    plt.title("BER results on " + dict["sim_param"]["channel_parameters"]["channel_type"])
+    # Check wether there is a "_" is the channel type description
+    chan_type = sym_match.sub(" ", dict["sim_param"]["channel_parameters"]["channel_type"])
+    # plot title
+    plt.title("BER results on " + chan_type)
     plt.xlabel("Eb/N0 (dB)")
     plt.ylabel("BER")
     plt.grid(True)
@@ -137,7 +142,7 @@ def plot_performance(dict_list, legend_list=None, output_path=None, max_eb_n0=No
         ax.set_ylim(bottom=10**(-5))
     # Save
     if output_path is not None:
-        matplotlib2tikz.save(output_path)
+        matplotlib2tikz.save(output_path, figureheight='11cm', figurewidth='17cm')
     # Plot
     plt.show()
 
