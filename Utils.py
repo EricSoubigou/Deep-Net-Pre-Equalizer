@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
+from matplotlib.lines import Line2D
 
 import re
 
@@ -106,10 +107,11 @@ def plot_performance(dict_list, legend_list=None, output_path=None, max_eb_n0=No
     sym_match = re.compile('(_)')
     # Begin the plot
     colors = cm.rainbow(np.linspace(0, 1, len(dict_list)))
+    markers = Line2D.markers
     # Set figure size
     plt.figure(figsize=(10, 5))
     # Loop on different performances dicts
-    for idx, (dict, color) in enumerate(zip(dict_list, colors)):
+    for idx, (dict, color, marker) in enumerate(zip(dict_list, colors, markers)):
         # Test wether there is an equalizer or not.
         if dict["sim_param"]["pre_equalizer"]["model_path"] is not None:
             pre_equalizer = "Pre-equalizer"
@@ -121,9 +123,11 @@ def plot_performance(dict_list, legend_list=None, output_path=None, max_eb_n0=No
         else:
             legend_add = ""
         # Plot the performances
+        #print(marker)
         plt.plot(dict["results"]["eb_n0_db"],
                  dict["results"]["ber"],
                  color=color,
+                 marker=marker,
                  label=str(dict["sim_param"]["equalizer"] + " " + pre_equalizer + " " + legend_add))
     # Finalize the legend
     plt.yscale("log")
