@@ -79,6 +79,8 @@ class Receiver:
                 print("Can't load {} => Generate a new model (random)".format(pre_equalizer_path))
         else:
             self.pre_equalizer = None
+            print("No pre equalizer used")
+
 
     def demodulate_frame(self, frame, demod_type="hard"):
         """
@@ -99,6 +101,9 @@ class Receiver:
             # Cast the data into a 2 times real array and convert it into a Float
             # tensor to use it with the pre_equalizer
             torch_frame = torch.from_numpy(from_complex_to_real(received_frame)).float()
+            # Save the incoming frame
+            self.pre_equalizer.tmp_frame = torch_frame.clone()
+#print("[Receiver.py::demodulate_frame::105] torch_frame.shape", torch_frame.shape)
             # Perform the pre-equalization.
             self.pre_eq_out = self.pre_equalizer(torch_frame)
             # Clone the output (to feedforward without the gradient problem due to Pytorch architecture)
@@ -122,6 +127,8 @@ class Receiver:
         #  And delete the pilot symbols
         time_frame = np.delete(time_frame, idx_to_extract, 0)
 
+#print("[Receiver.py::demodulate_frame::128] time_frame (time carriers)  online shape is ", time_frame.shape)
+
         # Use of an equalizer ?
         if self.equalizer is not None:
             # Create the new equalized frame which is
@@ -143,8 +150,14 @@ class Receiver:
             # No equalization performed
             eq_time_frame = time_frame
 
+#print("[Receiver.py::demodulate_frame::151] eq_time_frame shape online is ", eq_time_frame.shape)
+#print("[Receiver.py::demodulate_frame::151] eq_time_frame ", eq_time_frame)
         # Reshape the time frame in a 1D-array
         eq_time_frame = np.ravel(eq_time_frame)
+#print("[Receiver.py::demodulate_frame::154] eq_time_frame shape online is ", eq_time_frame.shape)
+#print("[Receiver.py::demodulate_frame::155] eq_time_frame ", eq_time_frame[1024:])
+#print("[Receiver.py::demodulate_frame::156] demod frame ",self.demodulator.demodulate(eq_time_frame, demod_type)[2045:])
+
 
         # Then we perform the demodulation
         return self.demodulator.demodulate(eq_time_frame, demod_type)
@@ -156,8 +169,10 @@ class Receiver:
         """
         if self.dec_trellis is not None:
             # Decode the received frame according to the trellis
+            # NOTA : The deep copy is important because it seems that the viterbi decoder use the
+            #  enc_frame and modify the last bits .....
             return cp.channelcoding.viterbi_decode(
-                enc_frame, self.dec_trellis, decoding_type="hard"  # , tb_length=15
+                deepcopy(enc_frame), self.dec_trellis, decoding_type="hard"  # , tb_length=15
             )
         else:
             return enc_frame
@@ -224,7 +239,6 @@ class Receiver:
             # No equalization performed
             carriers = carriers
 
-
         # Test if there are some off carriers
         if self.nb_off_carriers > 0:
             # Add the off_carriers
@@ -251,9 +265,15 @@ class Receiver:
         assert self.pre_equalizer is not None, "PreEqualizer is not instantiate for pre_equalizer for the Receiver"
         # Go from the decoded space to the encoded space
         est_frame_dec_enc = self.encode(est_frame_dec)
+#print("[Receiver.py::feedback::265] est_frame_dec_enc shape ", est_frame_dec_enc.shape)
         # Redo the whole chain in the opposite way:
         est_frame_dec_enc_mod = self.modulate_frame(est_frame_dec_enc)
+#print("[Receiver.py::feedback::268] est_frame_dec_enc_mod shape ", est_frame_dec_enc_mod.shape)
+#print("[Receiver.py::feedback::268] self.pre_eq_out.shape ", self.pre_eq_out.shape)
         # Perform the feedback update
         self.pre_equalizer.feedback_update(self.pre_eq_out, est_frame_dec_enc_mod)
 
+
+    def raw_mapping(self, frame):
+        return self.demodulator.modulate(frame)
 

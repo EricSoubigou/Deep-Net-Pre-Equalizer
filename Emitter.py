@@ -73,20 +73,32 @@ class Emitter:
         sending the data.
         :param frame: The frame that has to be modulated.
         """
+
         # Mapping of the data
+        #print("[Emitter.py::modulate_frame::78] frame", frame[2045:])
         mod_frame = self.modulator.modulate(frame)
+        #print("[Emitter.py::modulate_frame::78] mod_frame online shape is ", mod_frame.shape)
+        #print("[Emitter.py::modulate_frame::80] mod_frame", mod_frame[1024:])
+        #print("[Emitter.py::modulate_frame::81] frame shape ", frame.shape)
+
+        #for i in range(10):
+        #    mod_frame = self.modulator.modulate(frame)
+        #   print("[Emitter.py::modulate_frame::80] mod_frame", mod_frame[1024:], "iteration", i)
+
 
         # Test if the division is equal to an integer or not
         if len(mod_frame) % self.nb_on_carriers != 0:
             nb_ofdm_group = (len(mod_frame) // self.nb_on_carriers) + 1
-            # Add padding to the frame in order to get a interger number of PHY
+            # Add padding to the frame in order to get a integer number of PHY
             # frames used.
 
-            padding = np.zeros(
-                (self.nb_on_carriers - len(mod_frame) % self.nb_on_carriers)
+            padding = np.random.randint(
+                2,#np.zeros(
+                size=(self.nb_on_carriers - len(mod_frame) % self.nb_on_carriers)
                 * self.modulator.num_bits_symbol,
                 dtype=int,
             )
+            #print("[Emitter.py::modulate_frame::91] zeros added shape is ", self.modulator.modulate(padding).shape)
             # Add padding to the modulated frame
             mod_frame = np.concatenate(
                 (mod_frame, self.modulator.modulate(padding)), axis=0
@@ -97,6 +109,10 @@ class Emitter:
 
         # Then reshape the frame to perform the modulation
         carriers = np.reshape(mod_frame, (nb_ofdm_group, self.nb_on_carriers))
+
+        #print("[Emitter.py::modulate_frame::102] carriers online shape is ", carriers.shape)
+        #print("[Emitter.py::modulate_frame::102] carriers ", carriers)
+
 
         # Insert the pilot symbols at the given frequency along rows
         carriers = np.insert(
@@ -121,6 +137,8 @@ class Emitter:
         )
         # Return the global modulated frame
         return np.ravel(ofdm_signal_cp)
+
+
 
     def encode(self, frame):
         """

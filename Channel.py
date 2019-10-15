@@ -9,10 +9,14 @@ class Channel:
     """ Class of the AWGN channel.
     :mean: A float, mean of the gaussian noise.
     :var: A float, variance of the gaussian noise.
-    :non_lin_coeff: A float, value of the non-linearity coefficient of the channel.
-    :iq_imbalance: A float, value of the iq_imbalance.
-    :channel_taps: A 1-D float-array, containing the value of channel's taps.
-    :up_factor: A positive integer, value of the upsampling factor
+    :param non_lin_coeff_span: A float or an float array containing all the possible values
+        of the non linear coefficient values that gamma can take.
+    :param non_lin_coeff: A float, value of the non-linearity coefficient of the channel.
+    :param iq_imbalance_span: A float or an float array containing all the possible values
+        of the IQ_imbalance coefficient values that beta can take.
+    :param iq_imbalance: A float, value of the iq_imbalance.
+    :param channel_taps: A 1-D float-array, containing the value of channel's taps.
+    :param up_factor: A positive integer, value of the upsampling factor
     """
 
     def __init__(
@@ -24,16 +28,19 @@ class Channel:
         channel_taps=np.ones(1),
         up_factor=1,
     ):
+        np.random.seed(2019)
         self.mean = mean
         self.var = var
         self.gamma = non_lin_coeff
         self.beta = iq_imbalance
+        #print("Beta value", self.beta, "Gamma value", self.gamma)
         self.channel_taps = np.divide(channel_taps, np.linalg.norm(channel_taps))
         self.up_factor = up_factor
 
     def get_trough(self, mod_frame):
-        """ Return the value of the frame after get through the channel
-        :mod_frame: An array, input of of the channel. Is the modulated frame from an
+        """
+        Return the value of the frame after get through the channel
+        :param mod_frame: An array, input of of the channel. Is the modulated frame from an
         emiter.
         """
         # Add the IQ imbalance at the emiter side
@@ -71,8 +78,9 @@ class Channel:
         return output
 
     def add_iq_imbalance(self, x):
-        """ Add IQ imbalance to a given array
-        :x: An array, input which will be imbalanced according to attributes of the
+        """
+        Add IQ imbalance to a given array
+        :param x: An array, input which will be imbalanced according to attributes of the
         channel class
         """
         if self.beta is not None:
@@ -81,9 +89,10 @@ class Channel:
             return x
 
     def set_var(self, snr_db, modulation_order):
-        """ Set the variance of the gaussian noise of the channel
-        :snr_db: A float, Value of the Signal to Noise ratio in dB
-        :modulation_order: An integer, is the moudlation order of the constellation used
+        """
+        Set the variance of the gaussian noise of the channel
+        :param snr_db: A float, Value of the Signal to Noise ratio in dB
+        :param modulation_order: An integer, is the moudlation order of the constellation used
         """
         snr = 10 ** (snr_db / 10)
         # To define a bit better than it is right now
@@ -94,3 +103,19 @@ class Channel:
             * var_signal
             * np.linalg.norm(self.channel_taps)
         ) / (2 * np.log2(modulation_order) * snr)
+
+    def random_update_non_lin(self, gamma_set, beta_set):
+        """
+        Randomly update the non-lin coeffcient and IQ imbalance according to already set values
+        """
+        # Non lin coefficient update.
+        try:
+            self.gamma = np.random.choice(gamma_set, 1)[0]
+        except:
+            print("exception occurs for gamma set ! ")
+
+        # IQ imbalance update.
+        try:
+            self.beta = np.random.choice(beta_set, 1)[0]
+        except: # in the case where the set is None
+            print("exception occurs for beta set! ")

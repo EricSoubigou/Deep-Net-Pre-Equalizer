@@ -200,3 +200,31 @@ def generate_path_name_from_param_dict(sim_param_dict, add_on_path):
         add_on_path,
     )
     return filename
+
+def generate_path_name_from_param_dict_ser(sim_param_dict, add_on_path):
+    """
+    Generate a String being the path for the performances results for ser study.
+    :param sim_param_dict:
+    :param add_on_path:
+    :return: A string,
+    """
+    # Check if there is a pre-equalizer or not
+    if sim_param_dict["pre_equalizer"]["model_path"] is not None:
+        pre_equalizer = "pre_equalizer_update_" + str(sim_param_dict["pre_equalizer"]["feed_back_freq"])
+    else:
+        pre_equalizer = ""
+
+    # File name creation
+    filename = "./results/OFDM_eq_{}_coding_{}_{}_non_lin_coeff_{}_iq_im_{}_freq_update_{}_snr_{}_time_step_{}_{}_{}.pickle".format(
+        str(sim_param_dict["equalizer"]),
+        str(sim_param_dict["channel_coding"]["rho"]),
+        sim_param_dict["channel_parameters"]["channel_type"],
+        str(sim_param_dict["channel_parameters"]["non_lin_coeff"]),
+        str(sim_param_dict["channel_parameters"]["iq_imbalance"]),
+        str(sim_param_dict["channel_parameters"]["chan_param_freq_update"]),
+        str(sim_param_dict["sim_parameters"]["eb_n0_db"]),
+        str(sim_param_dict["sim_parameters"]["nb_time_step"]),
+        pre_equalizer,
+        add_on_path,
+    )
+    return filename

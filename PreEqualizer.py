@@ -32,6 +32,7 @@ class PreEqualizer(nn.Module):
         self.fc3 = nn.Linear(256, 2 * self.symb_nb)
         # Init trainable scalar
         self.alpha = nn.Parameter(torch.randn(1, 1))
+        self.tmp_frame = None
 
     def forward(self, symbols):
         """
@@ -54,18 +55,21 @@ class PreEqualizer(nn.Module):
         :param sgd_step:
         """
         # Convert the data into readable
-        #estimates = torch.from_numpy(from_complex_to_real(estimates)).float()
+#estimates = torch.from_numpy(from_complex_to_real(estimates)).float()
         targets = torch.from_numpy(from_complex_to_real(targets)).float()
-        # Define an optimizer
-        optimizer = optim.Adam(self.parameters(), lr=sgd_step)
+        # Zero the gradient buffers
+        self.internal_optimizer = optim.Adam(self.parameters(), lr=0.001)
+        self.internal_optimizer.zero_grad()
+        # Perform the pre-equalization.
+        pre_eq_out = self(self.tmp_frame)
+        # Compute the loss
+        loss = self.loss_function(pre_eq_out, targets)
+        #loss = self.loss_function(estimates, targets)
         # Perform the backward function
-        #print("estimates size ", estimates.size(), "targets size ", targets.size())
-        loss = self.loss_function(estimates, targets)
         loss.backward()
         # Perform update of the gradient
-        optimizer.step()
-        # Zero the gradient buffers
-        optimizer.zero_grad()
+        self.internal_optimizer.step()
+
 
     # Static Methods
     @staticmethod
